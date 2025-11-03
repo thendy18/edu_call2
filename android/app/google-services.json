@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "254035602639",
+    "project_id": "online-class-fde14",
+    "storage_bucket": "online-class-fde14.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:254035602639:android:24b12e663f597901359bba",
+        "android_client_info": {
+          "package_name": "com.example.projek_akhir_edukasi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "254035602639-dai1cig6vk0gs81eptcggrjst5etp7v9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.projek_akhir_edukasi",
+            "certificate_hash": "93ccf11755bc3ce5c6af36e9a8ed512f3cc389fb"
+          }
+        },
+        {
+          "client_id": "254035602639-cv21glum8h9up1km83bcugatc50228h6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCKc5yRW4K8Gk0TCaEXFHn_gBJmQeXz8v0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "254035602639-cv21glum8h9up1km83bcugatc50228h6.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

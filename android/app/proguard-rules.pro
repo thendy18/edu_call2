@@ -1,0 +1,2 @@
+-keep class io.flutter.embedding.** { *; }
+-keep class **.zego.** { *; }
