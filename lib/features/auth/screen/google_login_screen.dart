@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:projek_akhir_edukasi/features/auth/service/google_auth_service.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/home_screen.dart';
+import 'package:projek_akhir_edukasi/features/home/screen/app_main_screen.dart';
 class GoogleLoginScreen extends StatefulWidget {
   const GoogleLoginScreen({super.key});
 
@@ -24,7 +24,7 @@ class _GoogleLoginScreenState extends State<GoogleLoginScreen> {
       if (userCredential != null && mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const HomeScreen()),
+          MaterialPageRoute(builder: (context) => const AppMainScreen()),
         );
       } else {
         setState(() {

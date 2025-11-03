@@ -1,4 +1,5 @@
 // lib/features/home/screen/profile_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:projek_akhir_edukasi/features/auth/screen/google_login_screen.dart';
@@ -11,32 +12,8 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-    
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'), 
-        backgroundColor: Colors.blue,
-        elevation: 0,
-        centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-
-              //  1: LOGOUT LOGIC 
-              await GoogleAuthService().signOut();
-              
-              if (context.mounted) {
-                // PERBAIKAN 2: NAVIGASI 
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (context) => const GoogleLoginScreen()),
-                  (route) => false, // Hapus semua history
-                );
-              }
-            },
-          ),
-        ],
-      ),
+      // --- Tombol logout dipindahkan ke BODY agar bisa diakses ---
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -68,6 +45,28 @@ class ProfileScreen extends StatelessWidget {
               user?.email ?? '',
               style: Theme.of(context).textTheme.bodyMedium,
             ),
+            
+            // --- TOMBOL LOGOUT DIPINDAHKAN KE SINI (BODY) ---
+            const SizedBox(height: 30),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await GoogleAuthService().signOut();
+                
+                if (context.mounted) {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(builder: (context) => const GoogleLoginScreen()),
+                    (route) => false, // Hapus semua history
+                  );
+                }
+              },
+              icon: const Icon(Icons.logout),
+              label: const Text('Log Out'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+                foregroundColor: Colors.white,
+              ),
+            ),
+            // ------------------------------------------------
           ],
         ),
       ),

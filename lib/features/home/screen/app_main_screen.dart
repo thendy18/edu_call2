@@ -1,4 +1,5 @@
 // lib/features/home/screen/app_main_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/home_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/profile_screen.dart';
@@ -15,7 +16,6 @@ class _AppMainScreenState extends State<AppMainScreen> {
 
   // Daftar halaman yang akan ditampilkan
   List<Widget> pages = [
-
     // Halaman 0: Home
     const HomeScreen(), 
     
@@ -26,7 +26,18 @@ class _AppMainScreenState extends State<AppMainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[_page], // tampilkan halaman sesuai _page
+      // TAMBAHKAN APPBAR DI SINI agar Bottom Bar tidak tertutup
+      // Kita setel judulnya secara dinamis
+      appBar: AppBar(
+        title: Text(_page == 0 ? 'Home' : 'Profile'),
+        elevation: 0,
+        centerTitle: true,
+      ),
+      
+      // Halaman yang sedang aktif
+      body: pages[_page], 
+      
+      // Bottom Navigation Bar
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _page,
         onTap: (index) {
