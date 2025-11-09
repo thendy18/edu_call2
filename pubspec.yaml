@@ -38,8 +38,10 @@ dependencies:
   firebase_auth: ^5.1.1
   google_sign_in: ^6.2.1
   cloud_firestore: ^5.0.2
-  flutter_riverpod: ^3.0.3
   zego_uikit_prebuilt_video_conference: ^2.10.5
+  url_launcher: ^6.3.2
+  shared_preferences: ^2.5.3
+  flutter_riverpod: ^2.5.1
 
 dev_dependencies:
   flutter_test:

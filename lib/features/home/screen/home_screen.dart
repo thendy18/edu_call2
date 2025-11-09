@@ -1,137 +1,130 @@
 // lib/features/home/screen/home_screen.dart
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart';
+// Impor 4 halaman kita
+import 'package:projek_akhir_edukasi/features/home/screen/join_meeting_screen.dart';
+import 'package:projek_akhir_edukasi/features/home/screen/start_meeting_screen.dart';
+import 'package:projek_akhir_edukasi/features/home/screen/tasks_screen.dart';      
+import 'package:projek_akhir_edukasi/features/home/screen/resources_screen.dart';  
 
-
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
-
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-
-  // Controller untuk menyimpan ID yang diketik user (untuk Join Meeting)
-  final TextEditingController _meetingIDController = TextEditingController();
-
-  // Fungsi untuk Start Meeting BARU (membuat ID acak)
-  void _startNewMeeting() {
-    // Buat ID acak 6 digit
-    String newMeetingID = (100000 + Random().nextInt(900000)).toString();
-
-    // Pindah ke halaman meeting
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => MeetingScreen(meetingID: newMeetingID),
-      ),
-    );
-  }
-
-  // Fungsi untuk Join Meeting 
-  void _joinMeeting() {
-
-    // Ambil ID dari text field, hilangkan spasi
-    String meetingID = _meetingIDController.text.trim();
-
-    if (meetingID.isNotEmpty) {
-      // Pindah ke halaman meeting dengan ID yang diketik user
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => MeetingScreen(meetingID: meetingID),
-        ),
-      );
-    } else {
-      // peringatan jika ID kosong
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Silakan masukkan Meeting ID')),
-      );
-    }
-  }
-
-  // Hapus controller saat widget tidak dipakai agar tidak terjadi memory leak
-  @override
-  void dispose() {
-    _meetingIDController.dispose();
-    super.dispose();
-  }
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Home'),
-      //   elevation: 0,
-      //   centerTitle: true,
-      // ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Tombol Start Meeting
-          _MeetingButton(
-            onPressed: _startNewMeeting, 
-            text: 'Start New Meeting',
-            icon: Icons.videocam,
-          ),
-
-          const SizedBox(height: 20),
-
-          // INPUT FIELD UNTUK JOIN MEETING 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 40),
-            child: TextField(
-              controller: _meetingIDController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Enter Meeting ID',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                // TOMBOL MEET
+                _HomeButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const StartMeetingScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icons.videocam,
+                  text: 'Meet',
+                  color: Colors.orange,
                 ),
-              ),
+                // TOMBOL JOIN
+                _HomeButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const JoinMeetingScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icons.add_box_rounded,
+                  text: 'Join',
+                  color: Colors.blue.shade700,
+                ),
+                _HomeButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const TasksScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icons.assignment, 
+                  text: 'Tugas',           
+                  color: Colors.blue.shade700,
+                ),
+                _HomeButton(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ResourcesScreen(),
+                      ),
+                    );
+                  },
+                  icon: Icons.topic,  
+                  text: 'Materi',   
+                  color: Colors.blue.shade700,
+                ),
+              ],
             ),
-          ),
-          // ----------------------------------------------------
-
-          // Tombol Join Meeting
-          _MeetingButton(
-            onPressed: _joinMeeting, 
-            text: 'Join Meeting',
-            icon: Icons.add_box_rounded,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-// widget kustom untuk tombol 
-class _MeetingButton extends StatelessWidget {
-  final VoidCallback onPressed;
-  final String text;
+// Widget kustom untuk tombol ikon
+class _HomeButton extends StatelessWidget {
+  final VoidCallback onTap;
   final IconData icon;
+  final String text;
+  final Color color;
 
-  const _MeetingButton({
-    required this.onPressed,
-    required this.text,
+  const _HomeButton({
+    required this.onTap,
     required this.icon,
+    required this.text,
+    required this.color,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
-      child: ElevatedButton.icon(
-        onPressed: onPressed,
-        icon: Icon(icon, size: 24),
-        label: Text(text, style: const TextStyle(fontSize: 16)),
-        style: ElevatedButton.styleFrom(
-          minimumSize: const Size(double.infinity, 50), 
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 65,
+              height: 65,
+              decoration: BoxDecoration(
+                color: color,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 5,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Icon(icon, color: Colors.white, size: 30),
+            ),
+            const SizedBox(height: 8),
+            Text(text),
+          ],
         ),
       ),
     );

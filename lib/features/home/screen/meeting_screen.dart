@@ -4,7 +4,6 @@ import 'package:projek_akhir_edukasi/secrets.dart';
 import 'package:zego_uikit_prebuilt_video_conference/zego_uikit_prebuilt_video_conference.dart';
 
 class MeetingScreen extends StatelessWidget {
-  // kita butu ID meeting untuk tahu harus join ke room mana
   final String meetingID;
 
   const MeetingScreen({
@@ -14,26 +13,30 @@ class MeetingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Ambil data user yang sedang login
     final user = FirebaseAuth.instance.currentUser!;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Meeting ID: $meetingID'),
-      ),
-      body: ZegoUIKitPrebuiltVideoConference(
-        appID: zegoAppID, // <-- dari file secrets.dart
-        appSign: zegoAppSign, // <-- dari file secrets.dart
-        userID: user.uid, // ID unik user
-        userName: user.displayName ?? 'User', // Nama user
-        conferenceID: meetingID, // ID room yang mau di-join
-        config: ZegoUIKitPrebuiltVideoConferenceConfig(
-          // TODO: atur konfigurasinya di sini
-          // Misalnya, matikan kamera/mic saat join
-          // turnOnCameraWhenJoining: false,
-          // turnOnMicrophoneWhenJoining: false,
+    // --- PERBAIKAN ALTERNATIF ---
+    // Kita bungkus seluruh Scaffold-nya
+    return SafeArea(
+      top: false, // Kita sudah punya AppBar, jadi tidak perlu padding atas
+      bottom: true, // Beri padding di bawah
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text('Meeting ID: $meetingID'),
+        ),
+        body: ZegoUIKitPrebuiltVideoConference(
+          appID: zegoAppID,
+          appSign: zegoAppSign,
+          userID: user.uid,
+          userName: user.displayName ?? 'User',
+          conferenceID: meetingID,
+          config: ZegoUIKitPrebuiltVideoConferenceConfig(
+            turnOnCameraWhenJoining: true,
+            turnOnMicrophoneWhenJoining: true,
+          ),
         ),
       ),
     );
+    // --- AKHIR PERBAIKAN ---
   }
 }
