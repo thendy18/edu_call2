@@ -8,7 +8,7 @@ import 'package:firebase_storage/firebase_storage.dart'; // Import firebase_stor
 import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart';
 
 class StartMeetingScreen extends StatefulWidget {
-  const StartMeetingScreen({Key? key}) : super(key: key);
+  const StartMeetingScreen({super.key});
 
   @override
   State<StartMeetingScreen> createState() => _StartMeetingScreenState();
@@ -98,6 +98,7 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
           _customPhotoURL = downloadURL;
           _isUploadingImage = false; // Hentikan loading
         });
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Foto profil berhasil diubah!')),
         );
@@ -105,6 +106,7 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
         setState(() {
           _isUploadingImage = false; // Hentikan loading jika error
         });
+        // ignore: use_build_context_synchronously
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal mengunggah foto: $e')),
         );
@@ -203,7 +205,7 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
                   _isAnonymous = value;
                 });
               },
-              activeColor: Colors.purple, // Ubah warna switch menjadi ungu
+              activeThumbColor: Colors.purple, // Ubah warna switch menjadi ungu
             ),
             const SizedBox(height: 12),
 

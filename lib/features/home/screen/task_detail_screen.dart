@@ -1,5 +1,5 @@
 // lib/features/home/screen/task_detail_screen.dart
-import 'dart:convert';
+//import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 // Import model Task dari file tasks_screen.dart
@@ -11,10 +11,10 @@ class TaskDetailScreen extends StatelessWidget {
   final VoidCallback onStatusChanged; 
 
   const TaskDetailScreen({
-    Key? key,
+    super.key,
     required this.task,
     required this.onStatusChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

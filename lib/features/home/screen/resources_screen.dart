@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart'; 
 
 class ResourcesScreen extends StatelessWidget {
-  const ResourcesScreen({Key? key}) : super(key: key);
+  const ResourcesScreen({super.key});
 
   // 2. Buat fungsi helper untuk membuka URL
   void _launchURL(String url) async {
@@ -80,12 +80,12 @@ class ResourceCard extends StatelessWidget {
   final VoidCallback onTap;
 
   const ResourceCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.description,
     required this.icon,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

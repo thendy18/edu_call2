@@ -3,10 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-// --- TAMBAHAN: Import halaman detail yang baru dibuat ---
-import 'package:projek_akhir_edukasi/features/home/screen/task_detail_screen.dart';
+// Tidak ada import untuk task_detail_screen.dart
 
-// --- Model Task (Sama seperti sebelumnya) ---
+// --- BAGIAN 1: MODEL DATA ---
 class Task {
   String title;
   String description;
@@ -39,39 +38,35 @@ class Task {
   }
 }
 
-// --- MODIFIKASI: StatefulWidget ---
+// --- BAGIAN 2: LAYAR UTAMA (LIST TUGAS) ---
 class TasksScreen extends StatefulWidget {
-  const TasksScreen({Key? key}) : super(key: key);
+  // --- PERBAIKAN: Menggunakan super.key ---
+  const TasksScreen({super.key});
 
   @override
   State<TasksScreen> createState() => _TasksScreenState();
 }
 
-// --- MODIFIKASI: Tambahkan 'with TickerProviderStateMixin' untuk TabBar ---
 class _TasksScreenState extends State<TasksScreen>
     with TickerProviderStateMixin {
   List<Task> _tasks = [];
   bool _isLoading = true;
-  
-  // --- TAMBAHAN: Controller untuk TabBar ---
   late final TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    // Inisialisasi TabController dengan 2 tab
     _tabController = TabController(length: 2, vsync: this);
-    // Panggil fungsi untuk memuat data
     _loadTasks();
   }
 
   @override
   void dispose() {
-    _tabController.dispose(); // Jangan lupa dispose controller
+    _tabController.dispose();
     super.dispose();
   }
 
-  // --- Fungsi _loadTasks dan _saveTasks (Sama seperti sebelumnya) ---
+  // --- Fungsi Load/Save ---
   Future<void> _loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
     final List<String> tasksJson = prefs.getStringList('tasks') ?? [];
@@ -90,16 +85,15 @@ class _TasksScreenState extends State<TasksScreen>
     await prefs.setStringList('tasks', tasksJson);
   }
 
-  // --- MODIFIKASI: Fungsi _toggleTaskStatus sekarang menerima Objek Task ---
+  // --- Fungsi Aksi (Toggle/Delete) ---
   void _toggleTaskStatus(Task taskToToggle) {
-    // Cari index dari task yang ingin di-toggle
     final int index = _tasks.indexOf(taskToToggle);
-    if (index == -1) return; // Tidak ketemu (seharusnya tidak terjadi)
+    if (index == -1) return;
 
     setState(() {
       _tasks[index].isCompleted = !_tasks[index].isCompleted;
     });
-    _saveTasks(); // Simpan perubahan
+    _saveTasks();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -113,14 +107,13 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 
-  // --- MODIFIKASI: Fungsi _deleteTask sekarang menerima Objek Task ---
-  // (Meskipun tidak dipakai di list, mungkin dipakai di detail nanti)
+  // --- Fungsi Delete (Dipakai di Tab Selesai) ---
   void _deleteTask(Task taskToDelete) {
     final String deletedTaskTitle = taskToDelete.title;
     setState(() {
       _tasks.remove(taskToDelete);
     });
-    _saveTasks(); // Simpan perubahan
+    _saveTasks();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -131,7 +124,7 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 
-  // --- Fungsi _showAddTaskDialog (Sama seperti sebelumnya) ---
+  // --- Fungsi Dialog Tambah Tugas (Perbaikan Context Versi FINAL) ---
   Future<void> _showAddTaskDialog() async {
     final TextEditingController titleController = TextEditingController();
     final TextEditingController descController = TextEditingController();
@@ -140,70 +133,72 @@ class _TasksScreenState extends State<TasksScreen>
 
     await showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return StatefulBuilder(
-          builder: (context, setDialogState) {
+          builder: (BuildContext statefulBuilderContext, StateSetter setDialogState) {
             return AlertDialog(
               title: const Text('Tambah Tugas Baru'),
-              content: Form(
-                key: formKey,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      TextFormField(
-                        controller: titleController,
-                        decoration:
-                            const InputDecoration(labelText: 'Judul Tugas'),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Judul tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                      TextFormField(
-                        controller: descController,
-                        decoration:
-                            const InputDecoration(labelText: 'Deskripsi'),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            selectedDate == null
-                                ? 'Pilih Batas Waktu (Opsional)'
-                                : 'Batas Waktu: ${DateFormat('d MMM yyyy').format(selectedDate!)}',
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.calendar_month),
-                            onPressed: () async {
-                              final DateTime? pickedDate =
-                                  await showDatePicker(
-                                context: context,
-                                initialDate: DateTime.now(),
-                                firstDate: DateTime.now(),
-                                lastDate: DateTime(2101),
-                              );
-                              if (pickedDate != null) {
-                                setDialogState(() {
-                                  selectedDate = pickedDate;
-                                });
-                              }
-                            },
-                          ),
-                        ],
-                      ),
-                    ],
+              content: Builder(builder: (BuildContext contentContext) {
+                return Form(
+                  key: formKey,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextFormField(
+                          controller: titleController,
+                          decoration:
+                              const InputDecoration(labelText: 'Judul Tugas'),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Judul tidak boleh kosong';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          controller: descController,
+                          decoration:
+                              const InputDecoration(labelText: 'Deskripsi'),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              selectedDate == null
+                                  ? 'Pilih Batas Waktu (Opsional)'
+                                  : 'Batas Waktu: ${DateFormat('d MMM yyyy').format(selectedDate!)}',
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.calendar_month),
+                              onPressed: () async {
+                                final DateTime? pickedDate =
+                                    await showDatePicker(
+                                  context: contentContext,
+                                  initialDate: DateTime.now(),
+                                  firstDate: DateTime.now(),
+                                  lastDate: DateTime(2101),
+                                );
+                                if (pickedDate != null) {
+                                  setDialogState(() {
+                                    selectedDate = pickedDate;
+                                  });
+                                }
+                              },
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              }),
               actions: [
                 TextButton(
                   child: const Text('Batal'),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
                   },
                 ),
                 ElevatedButton(
@@ -220,7 +215,7 @@ class _TasksScreenState extends State<TasksScreen>
                         _tasks.add(newTask);
                       });
                       _saveTasks();
-                      Navigator.of(context).pop();
+                      Navigator.of(dialogContext).pop();
                     }
                   },
                 ),
@@ -235,20 +230,20 @@ class _TasksScreenState extends State<TasksScreen>
     descController.dispose();
   }
 
-  // --- TAMBAHAN: Fungsi untuk navigasi ke halaman detail ---
+  // --- Fungsi Navigasi ke Detail ---
   void _navigateToDetail(Task task) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => TaskDetailScreen(
           task: task,
-          // Kirim fungsi _toggleTaskStatus ke halaman detail
           onStatusChanged: () => _toggleTaskStatus(task),
         ),
       ),
     );
   }
 
+  // --- Widget Build (Badan Utama) ---
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -256,7 +251,6 @@ class _TasksScreenState extends State<TasksScreen>
         title: const Text('Daftar Tugas'),
         centerTitle: true,
         elevation: 0,
-        // --- TAMBAHAN: Buat TabBar di bawah AppBar ---
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -265,15 +259,12 @@ class _TasksScreenState extends State<TasksScreen>
           ],
         ),
       ),
-      // --- MODIFIKASI: Body utama menggunakan TabBarView ---
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : TabBarView(
               controller: _tabController,
               children: [
-                // --- Halaman 1: List Tugas Belum Selesai ---
                 _buildTaskList(isCompleted: false),
-                // --- Halaman 2: List Tugas Selesai ---
                 _buildTaskList(isCompleted: true),
               ],
             ),
@@ -285,13 +276,11 @@ class _TasksScreenState extends State<TasksScreen>
     );
   }
 
-  // --- TAMBAHAN: Widget helper untuk membangun list tugas ---
+  // --- Widget Helper Build Task List ---
   Widget _buildTaskList({required bool isCompleted}) {
-    // Filter list tugas utama berdasarkan status
     final List<Task> filteredTasks =
         _tasks.where((task) => task.isCompleted == isCompleted).toList();
 
-    // Tampilkan pesan jika list kosong
     if (filteredTasks.isEmpty) {
       return Center(
         child: Text(
@@ -301,7 +290,6 @@ class _TasksScreenState extends State<TasksScreen>
       );
     }
 
-    // Bangun ListView
     return ListView.builder(
       padding: const EdgeInsets.fromLTRB(16.0, 16.0, 16.0, 80.0),
       itemCount: filteredTasks.length,
@@ -310,38 +298,168 @@ class _TasksScreenState extends State<TasksScreen>
 
         return TaskCard(
           task: task,
-          // Tekan kartu -> buka detail
           onCardTap: () => _navigateToDetail(task),
-          // Tekan tombol centang -> ubah status
           onToggleStatus: () => _toggleTaskStatus(task),
+          // --- INI LOGIKA DELETE YANG DIMINTA ---
+          onDelete: isCompleted ? () => _deleteTask(task) : null,
         );
       },
     );
   }
 }
 
-// --- MODIFIKASI: Widget TaskCard ---
-class TaskCard extends StatelessWidget {
+// --- BAGIAN 3: LAYAR DETAIL TUGAS ---
+class TaskDetailScreen extends StatelessWidget {
   final Task task;
-  final VoidCallback onCardTap; // Untuk klik seluruh kartu
-  final VoidCallback onToggleStatus; // Untuk klik tombol centang
+  final VoidCallback onStatusChanged;
 
-  const TaskCard({
-    Key? key,
+  // --- PERBAIKAN: Menggunakan super.key ---
+  const TaskDetailScreen({
+    super.key,
     required this.task,
-    required this.onCardTap,
-    required this.onToggleStatus,
-  }) : super(key: key);
+    required this.onStatusChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
-    // Tentukan warna ikon berdasarkan status
+    bool isOverdue = false;
+    if (task.dueDate != null && !task.isCompleted) {
+      isOverdue = task.dueDate!
+          .isBefore(DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day));
+    }
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Detail Tugas'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              task.title,
+              style: TextStyle(
+                fontSize: 24,
+                // --- PERBAIKAN 1/4 ---
+                fontWeight: FontWeight.bold, 
+                decoration: task.isCompleted
+                    ? TextDecoration.lineThrough
+                    : TextDecoration.none,
+              ),
+            ),
+            const SizedBox(height: 16),
+            if (task.dueDate != null)
+              Row(
+                children: [
+                  Icon(
+                    Icons.calendar_today,
+                    size: 16,
+                    color: isOverdue ? Colors.red : Colors.grey[700],
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Batas Waktu: ${DateFormat('d MMMM yyyy').format(task.dueDate!)}',
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: isOverdue ? Colors.red : Colors.grey[700],
+                      fontStyle: FontStyle.italic,
+                      fontWeight: isOverdue ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            const Divider(height: 30, thickness: 1),
+            Text(
+              'Deskripsi Tugas:',
+              style: TextStyle(
+                fontSize: 16,
+                // --- PERBAIKAN 2/4 ---
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              task.description.isEmpty ? '(Tidak ada deskripsi)' : task.description,
+              style: const TextStyle(fontSize: 16, height: 1.5),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'Lampiran:',
+              style: TextStyle(
+                fontSize: 16,
+                // --- PERBAIKAN 3/4 ---
+                fontWeight: FontWeight.bold,
+                color: Colors.grey[800],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                border: Border.all(color: Colors.grey[300]!),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Row(
+                children: [
+                  Icon(Icons.add_photo_alternate_outlined, color: Colors.grey),
+                  SizedBox(width: 12),
+                  Text(
+                    'Tambah foto (Fitur akan datang)',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () {
+                  onStatusChanged();
+                  Navigator.of(context).pop();
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: task.isCompleted ? Colors.grey : Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                child: Text(
+                  task.isCompleted ? 'Tandai Belum Selesai' : 'Tandai Selesai',
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// --- BAGIAN 4: WIDGET KARTU TUGAS ---
+class TaskCard extends StatelessWidget {
+  final Task task;
+  final VoidCallback onCardTap;
+  final VoidCallback onToggleStatus;
+  final VoidCallback? onDelete; // Opsional, untuk tombol delete
+
+  // --- PERBAIKAN: Menggunakan super.key ---
+  const TaskCard({
+    super.key,
+    required this.task,
+    required this.onCardTap,
+    required this.onToggleStatus,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     final Color iconColor = task.isCompleted ? Colors.green : Colors.grey[400]!;
     final IconData iconData = task.isCompleted
         ? Icons.check_circle
         : Icons.radio_button_unchecked;
 
-    // Cek apakah sudah lewat batas waktu
     bool isOverdue = false;
     if (task.dueDate != null && !task.isCompleted) {
       isOverdue = task.dueDate!
@@ -352,24 +470,20 @@ class TaskCard extends StatelessWidget {
       elevation: 2.0,
       margin: const EdgeInsets.only(bottom: 16.0),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      // Gunakan InkWell untuk efek "splash" saat ditekan
       child: InkWell(
-        onTap: onCardTap, // Klik di sini untuk ke detail
+        onTap: onCardTap,
         borderRadius: BorderRadius.circular(12),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- Tombol Centang (Toggle Status) ---
               IconButton(
                 icon: Icon(iconData, color: iconColor, size: 28),
-                onPressed: onToggleStatus, // Klik di sini untuk ubah status
+                onPressed: onToggleStatus,
                 padding: const EdgeInsets.only(right: 12.0),
                 constraints: const BoxConstraints(),
               ),
-
-              // --- Konten Utama (Judul, Deskripsi, Due Date) ---
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -378,6 +492,7 @@ class TaskCard extends StatelessWidget {
                       task.title,
                       style: TextStyle(
                         fontSize: 18,
+                        // --- PERBAIKAN 4/4 ---
                         fontWeight: FontWeight.bold,
                         decoration: task.isCompleted
                             ? TextDecoration.lineThrough
@@ -390,11 +505,9 @@ class TaskCard extends StatelessWidget {
                       style: TextStyle(
                         color: task.isCompleted ? Colors.grey[600] : Colors.black,
                       ),
-                      maxLines: 2, // Batasi deskripsi jadi 2 baris di list
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-
-                    // --- Tampilkan Batas Waktu (Due Date) ---
                     if (task.dueDate != null)
                       Padding(
                         padding: const EdgeInsets.only(top: 10.0),
@@ -417,12 +530,17 @@ class TaskCard extends StatelessWidget {
                           ],
                         ),
                       ),
-                    
-                    // --- HILANGKAN CHIP STATUS & TOMBOL DELETE ---
-                    // (Tidak perlu lagi karena sudah ada TabBar dan tombol centang)
                   ],
                 ),
               ),
+              // --- INI LOGIKA DELETE YANG DIMINTA ---
+              if (onDelete != null)
+                IconButton(
+                  icon: const Icon(Icons.delete_outline),
+                  color: Colors.red[700],
+                  tooltip: 'Hapus Tugas',
+                  onPressed: onDelete,
+                ),
             ],
           ),
         ),

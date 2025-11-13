@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class AnnouncementsScreen extends StatelessWidget {
-  const AnnouncementsScreen({Key? key}) : super(key: key);
+  const AnnouncementsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +53,12 @@ class AnnouncementCard extends StatelessWidget {
   final Color color;
 
   const AnnouncementCard({
-    Key? key,
+    super.key,
     required this.title,
     required this.date,
     required this.description,
     this.color = Colors.blue,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

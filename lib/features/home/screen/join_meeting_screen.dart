@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart'; //Impor Firebase Auth
 import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart'; 
 
 class JoinMeetingScreen extends StatefulWidget {
-  const JoinMeetingScreen({Key? key}) : super(key: key);
+  const JoinMeetingScreen({super.key});
 
   @override
   State<JoinMeetingScreen> createState() => _JoinMeetingScreenState();

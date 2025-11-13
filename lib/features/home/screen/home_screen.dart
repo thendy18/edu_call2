@@ -7,7 +7,7 @@ import 'package:projek_akhir_edukasi/features/home/screen/tasks_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/resources_screen.dart';  
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

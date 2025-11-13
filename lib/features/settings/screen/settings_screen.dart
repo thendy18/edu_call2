@@ -6,7 +6,7 @@ import 'package:url_launcher/url_launcher.dart'; // Impor url_launcher
 
 // --- PERUBAHAN: Ubah dari StatelessWidget menjadi ConsumerWidget ---
 class SettingsScreen extends ConsumerWidget {
-  const SettingsScreen({Key? key}) : super(key: key);
+  const SettingsScreen({super.key});
 
   // Fungsi helper untuk membuka URL (dari resources_screen)
   void _launchURL(String url) async {
