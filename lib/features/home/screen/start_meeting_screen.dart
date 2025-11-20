@@ -144,21 +144,10 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // --- TAMBAHAN ---
-      // AppBar dengan gradient ungu ke putih
       appBar: AppBar(
         title: const Text('Start Meeting'),
         centerTitle: true,
         elevation: 0,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.purple, Colors.white], // Gradient ungu ke putih
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -186,7 +175,7 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
                               _initials,
                               style: TextStyle(
                                 fontSize: 40,
-                                color: Colors.purple[800], // Ubah warna inisial menjadi ungu
+                                color: Theme.of(context).colorScheme.primary,
                                 fontWeight: FontWeight.bold,
                               ),
                             )
@@ -205,7 +194,7 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
                   _isAnonymous = value;
                 });
               },
-              activeThumbColor: Colors.purple, // Ubah warna switch menjadi ungu
+              activeColor: Theme.of(context).colorScheme.primary,
             ),
             const SizedBox(height: 12),
 
@@ -238,31 +227,15 @@ class _StartMeetingScreenState extends State<StartMeetingScreen> {
               onPressed: _startMeeting,
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(double.infinity, 50),
-                // --- TAMBAHAN ---
-                // Gradient pada tombol Start Meeting
-                padding: EdgeInsets.zero, // Hapus padding default untuk gradient
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              // Tambahkan Builder untuk menampilkan gradient di dalam tombol
-              child: Ink(
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Colors.purple, Colors.white], // Gradient ungu ke putih
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Container(
-                  alignment: Alignment.center,
-                  constraints: const BoxConstraints(minWidth: double.infinity, minHeight: 50),
-                  child: const Text(
-                    'Start Meeting',
-                    style: TextStyle(fontSize: 16, color: Colors.black), // Ubah warna teks agar kontras dengan gradient
-                  ),
-                ),
+              child: const Text(
+                'Start Meeting',
+                style: TextStyle(fontSize: 16),
               ),
             ),
           ],

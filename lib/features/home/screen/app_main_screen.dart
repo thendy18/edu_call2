@@ -1,9 +1,10 @@
 // lib/features/home/screen/app_main_screen.dart
 import 'package:flutter/material.dart';
+import 'package:projek_akhir_edukasi/features/chat/screen/chat_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/home_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/profile_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/announcements_screen.dart';
-import 'package:projek_akhir_edukasi/features/settings/screen/settings_screen.dart'; 
+import 'package:projek_akhir_edukasi/features/settings/screen/settings_screen.dart';
 
 class AppMainScreen extends StatefulWidget {
   const AppMainScreen({super.key});
@@ -17,20 +18,24 @@ class _AppMainScreenState extends State<AppMainScreen> {
 
   List<Widget> pages = [
     // Halaman 0: Home
-    const HomeScreen(), 
-    
-    // Halaman 1: Pengumuman
-    const AnnouncementsScreen(), 
+    const HomeScreen(),
 
-    // Halaman 2: Settings
-    const SettingsScreen(), 
-    
-    // Halaman 3: Profile
+    // Halaman 1: AI Chat
+    const ChatScreen(),
+
+    // Halaman 2: Pengumuman
+    const AnnouncementsScreen(),
+
+    // Halaman 3: Settings
+    const SettingsScreen(),
+
+    // Halaman 4: Profile
     const ProfileScreen(),
   ];
 
   List<String> pageTitles = [
     'Home',
+    'AI Chat',
     'Pengumuman',
     'Settings',
     'Profile',
@@ -45,12 +50,13 @@ class _AppMainScreenState extends State<AppMainScreen> {
         elevation: 0,
         centerTitle: true,
       ),
-      
+
       // Halaman yang sedang aktif
-      body: pages[_page], 
-      
+      body: pages[_page],
+
       // Bottom Navigation Bar
-      bottomNavigationBar: SafeArea( // Kita pertahankan SafeArea
+      bottomNavigationBar: SafeArea(
+        // Kita pertahankan SafeArea
         child: BottomNavigationBar(
           currentIndex: _page,
           onTap: (index) {
@@ -58,27 +64,26 @@ class _AppMainScreenState extends State<AppMainScreen> {
               _page = index;
             });
           },
-          type: BottomNavigationBarType.fixed, 
+          type: BottomNavigationBarType.fixed,
           items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+
             BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
+              icon: Icon(Icons.chat_bubble_outline),
+              label: 'AI Chat',
             ),
-            
+
             BottomNavigationBarItem(
-              icon: Icon(Icons.campaign_outlined), 
-              label: 'Pengumuman',                 
+              icon: Icon(Icons.campaign_outlined),
+              label: 'Pengumuman',
             ),
 
             BottomNavigationBarItem(
               icon: Icon(Icons.settings),
               label: 'Settings',
             ),
-            
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
+
+            BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
           ],
         ),
       ),

@@ -2,11 +2,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; 
-import 'package:shared_preferences/shared_preferences.dart'; 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:projek_akhir_edukasi/features/auth/screen/google_login_screen.dart';
 import 'package:projek_akhir_edukasi/features/home/screen/app_main_screen.dart';
-import 'package:projek_akhir_edukasi/features/settings/provider/theme_provider.dart'; 
+import 'package:projek_akhir_edukasi/features/settings/provider/theme_provider.dart';
 import 'package:projek_akhir_edukasi/firebase_options.dart';
 
 void main() async {
@@ -52,36 +53,37 @@ class MyApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    
     final themeMode = ref.watch(themeProvider);
-
-    // Warna "elegan"
-    const Color elegantPurple = Color(0xFFE0BBE4); 
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Edu Call', 
-      
+      title: 'Edu Call',
       themeMode: themeMode,
 
       // --- TEMA TERANG (LIGHT MODE) ---
       theme: ThemeData(
         brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFF8FAFC),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: elegantPurple,
+          seedColor: const Color(0xFF6366F1),
           brightness: Brightness.light,
         ),
-        useMaterial3: false, 
+        cardColor: Colors.white,
+        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.light().textTheme),
+        useMaterial3: true,
       ),
 
       // --- TEMA GELAP (DARK MODE) ---
       darkTheme: ThemeData(
         brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF0F172A),
         colorScheme: ColorScheme.fromSeed(
-          seedColor: elegantPurple,
+          seedColor: const Color(0xFF6366F1),
           brightness: Brightness.dark,
         ),
-        useMaterial3: false,
+        cardColor: Colors.white.withOpacity(0.05),
+        textTheme: GoogleFonts.poppinsTextTheme(ThemeData.dark().textTheme),
+        useMaterial3: true,
       ),
 
       // StreamBuilder untuk Auth
