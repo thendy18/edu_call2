@@ -19,7 +19,7 @@ class ResourceModel {
     required this.type,
   });
 
-  // Mengubah data dari Firestore menjadi Object Dart
+  // mengubah data dari firestire menjadi objek dart
   factory ResourceModel.fromSnapshot(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
     return ResourceModel(

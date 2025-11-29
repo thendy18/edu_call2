@@ -5,7 +5,7 @@ class ResourceService {
   final CollectionReference _resourcesCollection =
       FirebaseFirestore.instance.collection('resources');
 
-  // 1. CREATE: Tambah Materi Baru
+  // create materi baru
   Future<void> addResource({
     required String title,
     required String description,
@@ -19,12 +19,12 @@ class ResourceService {
       'url': url,
       'learningPlan': learningPlan,
       'type': type,
-      'summary': '', // Ringkasan awal kosong
+      'summary': '', // rangkuman awal kosong
       'createdAt': FieldValue.serverTimestamp(),
     });
   }
 
-  // 2. READ: Ambil Data (Stream real-time)
+  // ambil data 
   Stream<List<ResourceModel>> getResources() {
     return _resourcesCollection
         .orderBy('createdAt', descending: true)
@@ -36,7 +36,7 @@ class ResourceService {
     });
   }
 
-  // 3. UPDATE: Simpan Ringkasan
+  // save rangkuman 
   Future<void> updateSummary(String id, String newSummary) async {
     await _resourcesCollection.doc(id).update({'summary': newSummary});
   }
