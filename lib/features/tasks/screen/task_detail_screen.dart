@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 // Import model Task dari file tasks_screen.dart
-import 'package:projek_akhir_edukasi/features/home/screen/tasks_screen.dart';
+import 'package:projek_akhir_edukasi/features/tasks/screen/tasks_screen.dart';
 
 class TaskDetailScreen extends StatelessWidget {
   final Task task;

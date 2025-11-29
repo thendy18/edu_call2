@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:image_picker/image_picker.dart'; // Import image_picker
 import 'package:firebase_storage/firebase_storage.dart'; // Import firebase_storage
-import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart';
+import 'package:projek_akhir_edukasi/features/meeting/meeting_screen.dart';
 
 class StartMeetingScreen extends StatefulWidget {
   const StartMeetingScreen({super.key});

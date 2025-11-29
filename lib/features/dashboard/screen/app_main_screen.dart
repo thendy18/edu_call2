@@ -1,9 +1,9 @@
 // lib/features/home/screen/app_main_screen.dart
 import 'package:flutter/material.dart';
 import 'package:projek_akhir_edukasi/features/chat/screen/chat_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/home_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/profile_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/announcements_screen.dart';
+import 'package:projek_akhir_edukasi/features/dashboard/screen/home_screen.dart';
+import 'package:projek_akhir_edukasi/features/profile/screen/profile_screen.dart';
+import 'package:projek_akhir_edukasi/features/dashboard/screen/announcements_screen.dart';
 import 'package:projek_akhir_edukasi/features/settings/screen/settings_screen.dart';
 
 class AppMainScreen extends StatefulWidget {

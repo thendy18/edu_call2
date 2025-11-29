@@ -6,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:projek_akhir_edukasi/features/auth/screen/google_login_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/app_main_screen.dart';
+import 'package:projek_akhir_edukasi/features/dashboard/screen/app_main_screen.dart';
 import 'package:projek_akhir_edukasi/features/settings/provider/theme_provider.dart';
 import 'package:projek_akhir_edukasi/firebase_options.dart';
 

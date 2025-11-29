@@ -3,10 +3,11 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/start_meeting_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/tasks_screen.dart';
-import 'package:projek_akhir_edukasi/features/home/screen/resources_screen.dart';
+import 'package:projek_akhir_edukasi/features/academic/screen/classes_screen.dart'; // Import halaman baru
+import 'package:projek_akhir_edukasi/features/meeting/meeting_screen.dart';
+import 'package:projek_akhir_edukasi/features/meeting/start_meeting_screen.dart';
+import 'package:projek_akhir_edukasi/features/tasks/screen/tasks_screen.dart';
+import 'package:projek_akhir_edukasi/features/resources/screen/resources_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -234,11 +235,11 @@ class HomeScreen extends StatelessWidget {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userName = user?.displayName ?? 'Student';
 
-    // Mock upcoming classes data
-    final List<Map<String, String>> upcomingClasses = [
-      {'title': 'Matematika', 'subtitle': 'Hari ini pukul 10:00'},
-      {'title': 'Praktikum Fisika', 'subtitle': 'Besok pukul 14:00'},
-      {'title': 'Kimia', 'subtitle': 'Jumat pukul 09:00'},
+    // Mock data untuk preview di Home (hanya menampilkan data ringkas)
+    final List<Map<String, String>> previewClasses = [
+      {'title': 'Matematika Diskrit', 'subtitle': 'Hari ini pukul 08:00'},
+      {'title': 'Pemrograman Mobile', 'subtitle': 'Hari ini pukul 13:00'},
+      {'title': 'Basis Data', 'subtitle': 'Besok pukul 10:00'},
     ];
 
     return Scaffold(
@@ -354,7 +355,7 @@ class HomeScreen extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const ResourcesScreen(),
+                            builder: (context) => ResourcesScreen(),
                           ),
                         );
                       },
@@ -367,30 +368,52 @@ class HomeScreen extends StatelessWidget {
               ),
             ),
 
-            // Upcoming Classes Section
+            // Upcoming Classes Section (UPDATED)
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
-              child: Text(
-                'Kelas Mendatang',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.grey.shade900,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Kelas Mendatang',
+                    style: GoogleFonts.poppins(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.grey.shade900,
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ClassesScreen(),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      'Lihat Semua',
+                      style: GoogleFonts.poppins(
+                        color: const Color(0xFF6366F1),
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ],
               )
                   .animate()
                   .fadeIn(delay: 800.ms, duration: 600.ms)
                   .slideX(begin: -0.2, end: 0),
             ),
 
-            // Classes List
+            // Classes List (Preview only)
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              itemCount: upcomingClasses.length,
+              itemCount: previewClasses.length,
               itemBuilder: (context, index) {
-                final item = upcomingClasses[index];
+                final item = previewClasses[index];
                 return _HistoryTile(
                   title: item['title']!,
                   subtitle: item['subtitle']!,
@@ -409,7 +432,7 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Action Card Widget
+// Action Card Widget (Tetap sama)
 class _ActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -525,7 +548,7 @@ class _ActionCard extends StatelessWidget {
   }
 }
 
-// History Tile Widget
+// History Tile Widget (Tetap sama)
 class _HistoryTile extends StatelessWidget {
   final String title;
   final String subtitle;

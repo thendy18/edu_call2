@@ -1,7 +1,7 @@
 // lib/features/home/screen/join_meeting_screen.dart
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart'; //Impor Firebase Auth
-import 'package:projek_akhir_edukasi/features/home/screen/meeting_screen.dart'; 
+import 'package:projek_akhir_edukasi/features/meeting/meeting_screen.dart'; 
 
 class JoinMeetingScreen extends StatefulWidget {
   const JoinMeetingScreen({super.key});
