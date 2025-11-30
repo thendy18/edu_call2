@@ -21,7 +21,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
   @override
   void initState() {
     super.initState();
-    // Isi text field dengan ringkasan yang sudah ada di database
     _summaryController = TextEditingController(text: widget.resource.summary);
   }
 
@@ -31,7 +30,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     super.dispose();
   }
 
-  // Fungsi membuka URL
+  // membuka URL
   Future<void> _launchURL() async {
     final String url = widget.resource.url;
     if (url.isEmpty) return;
@@ -46,7 +45,7 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
     }
   }
 
-  // Fungsi menyimpan ringkasan ke Firebase
+  // menyimpan ringkasan ke Firebase
   Future<void> _saveSummary() async {
     setState(() => _isSaving = true);
     try {
@@ -195,7 +194,6 @@ class _ResourceDetailScreenState extends State<ResourceDetailScreen> {
 
               const SizedBox(height: 24),
 
-              // --- Bagian Ringkasan (Editable) ---
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
