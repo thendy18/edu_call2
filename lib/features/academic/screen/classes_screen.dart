@@ -13,6 +13,49 @@ class ClassesScreen extends StatefulWidget {
 class _ClassesScreenState extends State<ClassesScreen> {
   final AcademicService _academicService = AcademicService();
 
+  // Dialog Konfirmasi Hapus
+  void _showDeleteConfirmation(BuildContext context, CourseModel course) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text("Hapus Kelas?", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+          "Apakah Anda yakin ingin membatalkan mata kuliah ${course.name}?",
+          style: GoogleFonts.poppins(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Batal", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              // 1. Panggil Service Hapus
+              _academicService.removeCourse(course.id);
+              
+              // 2. Tutup Dialog
+              Navigator.pop(ctx);
+              
+              // 3. Refresh UI
+              setState(() {});
+
+              // 4. Feedback
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text("${course.name} berhasil dihapus"),
+                  backgroundColor: Colors.redAccent,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: const Text("Hapus", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _showAddClassSheet() {
     showModalBottomSheet(
       context: context,
@@ -48,11 +91,11 @@ class _ClassesScreenState extends State<ClassesScreen> {
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: currentSKS >= 22 ? null : _showAddClassSheet,
-        backgroundColor: currentSKS >= 22 ? Colors.grey : const Color(0xFF6366F1),
+        onPressed: currentSKS >= 24 ? null : _showAddClassSheet, // Max 24 SKS
+        backgroundColor: currentSKS >= 24 ? Colors.grey : const Color(0xFF6366F1),
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text(
-          currentSKS >= 22 ? "SKS Penuh" : "Tambah Kelas",
+          currentSKS >= 24 ? "SKS Penuh" : "Tambah Kelas",
           style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600),
         ),
       ),
@@ -93,7 +136,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "$currentSKS / 22",
+                        "$currentSKS / 24",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontSize: 32,
@@ -109,7 +152,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                         width: 60,
                         height: 60,
                         child: CircularProgressIndicator(
-                          value: currentSKS / 22,
+                          value: currentSKS / 24,
                           backgroundColor: Colors.white.withOpacity(0.2),
                           valueColor: const AlwaysStoppedAnimation(Colors.white),
                           strokeWidth: 6,
@@ -117,7 +160,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
                         ),
                       ),
                       Text(
-                        "${((currentSKS / 22) * 100).toInt()}%",
+                        "${((currentSKS / 24) * 100).toInt()}%",
                         style: GoogleFonts.poppins(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
@@ -218,20 +261,10 @@ class _ClassesScreenState extends State<ClassesScreen> {
                             ),
                           ),
                         ),
+                        // --- FITUR HAPUS DI SINI ---
                         trailing: IconButton(
                           icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
-                          onPressed: () {
-                            // Implement logic delete jika mau
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Fitur Drop kelas belum aktif",
-                                  style: GoogleFonts.poppins(),
-                                ),
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                          },
+                          onPressed: () => _showDeleteConfirmation(context, course),
                         ),
                       ),
                     ).animate().fadeIn(delay: (100 * index).ms).slideX();
@@ -245,7 +278,7 @@ class _ClassesScreenState extends State<ClassesScreen> {
   }
 }
 
-// Bottom Sheet untuk memilih kelas baru
+// Bottom Sheet untuk memilih kelas baru (Sama seperti sebelumnya)
 class _AddClassSheet extends StatelessWidget {
   final VoidCallback onClassAdded;
   _AddClassSheet({required this.onClassAdded});
@@ -292,6 +325,7 @@ class _AddClassSheet extends StatelessWidget {
               itemCount: available.length,
               itemBuilder: (context, index) {
                 final course = available[index];
+                // Cek apakah course sudah diambil
                 final bool isAlreadyTaken = _service.enrolledCourses.any((c) => c.id == course.id);
                 
                 return Container(

@@ -5,12 +5,16 @@ import '../data/resource_model.dart';
 import '../data/resource_service.dart';
 import 'resource_detail_screen.dart';
 
-class ResourcesScreen extends StatelessWidget {
-  ResourcesScreen({super.key});
+class ResourcesScreen extends StatefulWidget {
+  const ResourcesScreen({super.key});
 
+  @override
+  State<ResourcesScreen> createState() => _ResourcesScreenState();
+}
+
+class _ResourcesScreenState extends State<ResourcesScreen> {
   final ResourceService _resourceService = ResourceService();
 
-  // Helper Icon berdasarkan tipe
   IconData _getIcon(String type) {
     switch (type) {
       case 'video': return Icons.play_circle_outline;
@@ -20,8 +24,51 @@ class ResourcesScreen extends StatelessWidget {
     }
   }
 
-  // Dialog Tambah Materi
-  void _showAddResourceDialog(BuildContext context) {
+  // --- LOGIKA 1: Hapus Resource (Dengan Konfirmasi) ---
+  void _confirmDelete(String id, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text('Hapus Materi?', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+        content: Text(
+          'Apakah Anda yakin ingin menghapus materi "$title"?\nTindakan ini tidak dapat dibatalkan.',
+          style: GoogleFonts.poppins(),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx); // Tutup dialog
+              _deleteResource(id); // Langsung hapus
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+            child: const Text('Hapus', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _deleteResource(String id) async {
+    try {
+      await _resourceService.deleteResource(id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Materi dihapus'), backgroundColor: Colors.grey),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Gagal menghapus: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  // --- LOGIKA 2: Tambah Resource (Tanpa Password, Tapi Ada Konfirmasi Simpan) ---
+  void _showAddResourceDialog() {
     final titleController = TextEditingController();
     final descController = TextEditingController();
     final urlController = TextEditingController();
@@ -30,7 +77,8 @@ class ResourcesScreen extends StatelessWidget {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
         title: Text('Tambah Materi Baru', style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
@@ -69,21 +117,55 @@ class ResourcesScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Batal'),
           ),
           ElevatedButton(
-            onPressed: () async {
+            onPressed: () {
               if (titleController.text.isNotEmpty) {
-                // Panggil Service untuk simpan ke Firebase
-                await _resourceService.addResource(
-                  title: titleController.text,
-                  description: descController.text,
-                  url: urlController.text,
-                  learningPlan: planController.text,
-                  type: selectedType,
+                // Tampilkan Konfirmasi "Apakah Anda Yakin?"
+                showDialog(
+                  context: context,
+                  builder: (confirmContext) => AlertDialog(
+                    title: Text("Konfirmasi", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+                    content: Text("Apakah Anda yakin ingin menambahkan materi ini?", style: GoogleFonts.poppins()),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmContext), // Tutup konfirmasi
+                        child: const Text("Cek Lagi", style: TextStyle(color: Colors.grey)),
+                      ),
+                      ElevatedButton(
+                        onPressed: () async {
+                          // 1. Tutup Konfirmasi
+                          Navigator.pop(confirmContext);
+                          // 2. Tutup Form Input
+                          Navigator.pop(dialogContext);
+                          
+                          // 3. Simpan ke Database
+                          await _resourceService.addResource(
+                            title: titleController.text,
+                            description: descController.text,
+                            url: urlController.text,
+                            learningPlan: planController.text,
+                            type: selectedType,
+                          );
+
+                          // 4. Feedback
+                          if (mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Materi berhasil ditambahkan'), 
+                                backgroundColor: Color(0xFF4ADE80)
+                              ),
+                            );
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1)),
+                        child: const Text("Ya, Simpan", style: TextStyle(color: Colors.white)),
+                      ),
+                    ],
+                  ),
                 );
-                if (context.mounted) Navigator.pop(context);
               }
             },
             style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1)),
@@ -105,10 +187,14 @@ class ResourcesScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         foregroundColor: isDark ? Colors.white : Colors.black87,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
-      // Tombol Tambah Mengambang
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => _showAddResourceDialog(context),
+        // Langsung buka form tanpa password
+        onPressed: _showAddResourceDialog,
         backgroundColor: const Color(0xFF6366F1),
         icon: const Icon(Icons.add, color: Colors.white),
         label: Text('Tambah', style: GoogleFonts.poppins(color: Colors.white)),
@@ -117,7 +203,6 @@ class ResourcesScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF121212) : const Color(0xFFF5F7FA),
         ),
-        // Menggunakan StreamBuilder untuk data Real-time
         child: StreamBuilder<List<ResourceModel>>(
           stream: _resourceService.getResources(),
           builder: (context, snapshot) {
@@ -146,11 +231,16 @@ class ResourcesScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = resources[index];
                 
-                return Card(
-                  elevation: 2,
+                return Container(
                   margin: const EdgeInsets.only(bottom: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: isDark ? Colors.white.withOpacity(0.1) : Colors.grey.shade200),
+                    boxShadow: [
+                      BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                    ],
+                  ),
                   child: ListTile(
                     contentPadding: const EdgeInsets.all(16),
                     leading: Container(
@@ -181,8 +271,14 @@ class ResourcesScreen extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
+                    trailing: IconButton(
+                      icon: Icon(Icons.delete_outline, color: Colors.grey.shade400),
+                      onPressed: () {
+                        // Konfirmasi hapus tanpa password
+                        _confirmDelete(item.id, item.title);
+                      },
+                    ),
                     onTap: () {
-                      // Navigasi ke Detail Screen
                       Navigator.push(
                         context,
                         MaterialPageRoute(

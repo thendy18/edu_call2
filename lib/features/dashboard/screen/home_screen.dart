@@ -1,3 +1,5 @@
+// lib/features/dashboard/screen/home_screen.dart
+
 import 'dart:ui';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -6,11 +8,11 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:projek_akhir_edukasi/features/academic/data/course_data.dart';
 import 'package:projek_akhir_edukasi/features/academic/screen/classes_screen.dart';
+import 'package:projek_akhir_edukasi/features/academic/screen/class_detail_screen.dart';
 import 'package:projek_akhir_edukasi/features/meeting/meeting_screen.dart';
 import 'package:projek_akhir_edukasi/features/meeting/start_meeting_screen.dart';
 import 'package:projek_akhir_edukasi/features/tasks/screen/tasks_screen.dart';
 import 'package:projek_akhir_edukasi/features/resources/screen/resources_screen.dart';
-import 'package:projek_akhir_edukasi/features/academic/screen/class_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,17 +24,33 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   DateTime _selectedDate = DateTime.now();
   final AcademicService _academicService = AcademicService();
+  late ScrollController _calendarController;
+
+  @override
+  void initState() {
+    super.initState();
+    // LOGIKA AUTO-SCROLL:
+    // Item width = 60 + Margin right 12 = 72 pixels per item.
+    // Kita menambahkan buffer 14 hari ke belakang.
+    // Jadi, index ke-14 adalah "Senin minggu ini".
+    // Offset = 14 * 72.0 = 1008.0
+    // Ini membuat tampilan awal langsung fokus ke minggu ini, tapi user bisa scroll ke kiri untuk lihat masa lalu.
+    _calendarController = ScrollController(initialScrollOffset: 14 * 72.0);
+  }
+
+  @override
+  void dispose() {
+    _calendarController.dispose();
+    super.dispose();
+  }
 
   void _startNewMeeting(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => const StartMeetingScreen(),
-      ),
+      MaterialPageRoute(builder: (context) => const StartMeetingScreen()),
     );
   }
 
-  // --- PERBAIKAN: Kode Dialog dimasukkan kembali ---
   void _showJoinDialog(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
     final TextEditingController meetingIdController = TextEditingController();
@@ -81,14 +99,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(
                         labelText: 'Meeting ID',
                         labelStyle: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.grey.shade600),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            color:
+                                isDark ? Colors.white70 : Colors.grey.shade600),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         filled: true,
                         fillColor: isDark
                             ? Colors.white.withOpacity(0.05)
                             : Colors.grey.shade50,
                       ),
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87),
                     ),
                     const SizedBox(height: 16),
                     TextField(
@@ -96,14 +117,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       decoration: InputDecoration(
                         labelText: 'Your Name',
                         labelStyle: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.grey.shade600),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                            color:
+                                isDark ? Colors.white70 : Colors.grey.shade600),
+                        border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         filled: true,
                         fillColor: isDark
                             ? Colors.white.withOpacity(0.05)
                             : Colors.grey.shade50,
                       ),
-                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                      style: TextStyle(
+                          color: isDark ? Colors.white : Colors.black87),
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -113,7 +137,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             onPressed: () => Navigator.pop(dialogContext),
                             child: Text('Cancel',
                                 style: TextStyle(
-                                    color: isDark ? Colors.white70 : Colors.grey.shade700)),
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.grey.shade700)),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -126,7 +152,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => MeetingScreen(meetingID: meetingId),
+                                    builder: (context) =>
+                                        MeetingScreen(meetingID: meetingId),
                                   ),
                                 );
                               }
@@ -134,7 +161,8 @@ class _HomeScreenState extends State<HomeScreen> {
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6366F1),
                               foregroundColor: Colors.white,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12)),
                             ),
                             child: const Text('Join'),
                           ),
@@ -156,13 +184,17 @@ class _HomeScreenState extends State<HomeScreen> {
     final User? user = FirebaseAuth.instance.currentUser;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userName = user?.displayName ?? 'Student';
-    final dailySchedules = _academicService.getScheduleForDay(_selectedDate.weekday);
+
+    // Ambil jadwal berdasarkan hari yang dipilih di kalender
+    final dailySchedules =
+        _academicService.getScheduleForDay(_selectedDate.weekday);
 
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Header Section
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 60, 24, 16),
               child: Column(
@@ -171,23 +203,26 @@ class _HomeScreenState extends State<HomeScreen> {
                   Text(
                     'Hello, $userName!',
                     style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.grey.shade900,
-                    ),
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.grey.shade900),
                   ).animate().fadeIn().slideX(),
                   const SizedBox(height: 8),
                   Text(
                     'Ready to learn today?',
-                    style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
+                    style:
+                        GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
                   ).animate().fadeIn(delay: 200.ms),
                 ],
               ),
             ),
 
+            // Horizontal Calendar Widget (Updated)
             _buildWeeklyCalendar(isDark),
+
             const SizedBox(height: 24),
 
+            // Action Grid
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
@@ -214,6 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
+            // Additional Buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
@@ -224,7 +260,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.assignment,
                       isGlass: true,
                       onTap: () => Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => const TasksScreen())),
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const TasksScreen())),
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -234,13 +272,16 @@ class _HomeScreenState extends State<HomeScreen> {
                       icon: Icons.topic,
                       isGlass: true,
                       onTap: () => Navigator.push(
-                          context, MaterialPageRoute(builder: (context) => ResourcesScreen())),
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ResourcesScreen())),
                     ),
                   ),
                 ],
               ),
             ),
 
+            // Upcoming Classes Header
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Row(
@@ -255,19 +296,25 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => const ClassesScreen())).then((_) {
+                      Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const ClassesScreen()))
+                          .then((_) {
+                        // Refresh saat kembali
                         setState(() {});
                       });
                     },
                     child: Text('KRS',
                         style: GoogleFonts.poppins(
-                            color: const Color(0xFF6366F1), fontWeight: FontWeight.w600)),
+                            color: const Color(0xFF6366F1),
+                            fontWeight: FontWeight.w600)),
                   ),
                 ],
               ),
             ),
 
+            // Dynamic Class List
             if (dailySchedules.isEmpty)
               Padding(
                 padding: const EdgeInsets.all(24.0),
@@ -300,6 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ).animate().fadeIn(delay: (100 * index).ms).slideX();
                 },
               ),
+
             const SizedBox(height: 24),
           ],
         ),
@@ -307,25 +355,42 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  // --- WIDGET KALENDER UPDATED ---
   Widget _buildWeeklyCalendar(bool isDark) {
     DateTime now = DateTime.now();
-    int currentDayOfWeek = now.weekday;
-    DateTime startOfWeek = now.subtract(Duration(days: currentDayOfWeek - 1));
+
+    // 1. Cari Hari Senin minggu ini
+    int currentDayOfWeek = now.weekday; // 1=Senin ... 7=Minggu
+    DateTime startOfCurrentWeek = now.subtract(Duration(days: currentDayOfWeek - 1));
+    
+    // 2. Mundur 14 hari dari Senin tersebut (Titik Awal List)
+    DateTime startDate = startOfCurrentWeek.subtract(const Duration(days: 14));
 
     return SizedBox(
       height: 85,
       child: ListView.builder(
+        controller: _calendarController, // Pasang Controller
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 24),
-        itemCount: 7,
+        // Total: 14 hari lalu + 7 hari minggu ini + 7 hari minggu depan = 28 hari
+        itemCount: 28, 
         itemBuilder: (context, index) {
-          DateTime date = startOfWeek.add(Duration(days: index));
-          bool isSelected =
-              date.day == _selectedDate.day && date.month == _selectedDate.month;
-          bool isToday = date.day == now.day && date.month == now.month;
+          DateTime date = startDate.add(Duration(days: index));
+
+          bool isSelected = date.day == _selectedDate.day &&
+              date.month == _selectedDate.month &&
+              date.year == _selectedDate.year;
+
+          bool isToday = date.day == now.day &&
+              date.month == now.month &&
+              date.year == now.year;
 
           return GestureDetector(
-            onTap: () => setState(() => _selectedDate = date),
+            onTap: () {
+              setState(() {
+                _selectedDate = date;
+              });
+            },
             child: Container(
               width: 60,
               margin: const EdgeInsets.only(right: 12),
@@ -340,6 +405,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       : (isToday
                           ? const Color(0xFF6366F1).withOpacity(0.5)
                           : Colors.transparent),
+                  width: isToday && !isSelected ? 1.5 : 1,
                 ),
                 boxShadow: isSelected
                     ? [
@@ -357,7 +423,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     DateFormat('EEE').format(date),
                     style: GoogleFonts.poppins(
                       fontSize: 12,
-                      color: isSelected ? Colors.white : Colors.grey,
+                      color: isSelected
+                          ? Colors.white
+                          : (isToday ? const Color(0xFF6366F1) : Colors.grey),
+                      fontWeight: isToday ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -381,6 +450,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 }
 
+// Widget Tile Kelas
 class _ClassScheduleTile extends StatelessWidget {
   final CourseModel course;
   final ClassSchedule schedule;
@@ -406,8 +476,8 @@ class _ClassScheduleTile extends StatelessWidget {
         decoration: BoxDecoration(
           color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-              color: isDark ? Colors.white10 : Colors.grey.shade200),
+          border:
+              Border.all(color: isDark ? Colors.white10 : Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
                 color: Colors.black.withOpacity(0.03),
@@ -429,7 +499,8 @@ class _ClassScheduleTile extends StatelessWidget {
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold, color: course.color)),
                   Text("s/d",
-                      style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey)),
+                      style: GoogleFonts.poppins(
+                          fontSize: 10, color: Colors.grey)),
                   Text(schedule.endTime,
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold, color: course.color)),
@@ -447,7 +518,8 @@ class _ClassScheduleTile extends StatelessWidget {
                           fontSize: 16,
                           color: isDark ? Colors.white : Colors.black87)),
                   Text("${course.code} • ${course.sks} SKS",
-                      style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                      style: GoogleFonts.poppins(
+                          fontSize: 12, color: Colors.grey)),
                   const SizedBox(height: 4),
                   Row(
                     children: [
@@ -455,7 +527,8 @@ class _ClassScheduleTile extends StatelessWidget {
                           size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
                       Text(schedule.room,
-                          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                          style: GoogleFonts.poppins(
+                              fontSize: 12, color: Colors.grey)),
                       const SizedBox(width: 12),
                       Icon(Icons.person_outline, size: 14, color: Colors.grey),
                       const SizedBox(width: 4),
@@ -477,6 +550,7 @@ class _ClassScheduleTile extends StatelessWidget {
   }
 }
 
+// Widget Action Card
 class _ActionCard extends StatelessWidget {
   final String title;
   final IconData icon;

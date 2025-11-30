@@ -17,19 +17,14 @@ class _AppMainScreenState extends State<AppMainScreen> {
   int _page = 0; // Halaman yang sedang aktif
 
   List<Widget> pages = [
-    // Halaman 0: Home
     const HomeScreen(),
 
-    // Halaman 1: AI Chat
     const ChatScreen(),
 
-    // Halaman 2: Pengumuman
     const AnnouncementsScreen(),
 
-    // Halaman 3: Settings
     const SettingsScreen(),
 
-    // Halaman 4: Profile
     const ProfileScreen(),
   ];
 

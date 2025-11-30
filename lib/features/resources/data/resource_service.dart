@@ -40,4 +40,8 @@ class ResourceService {
   Future<void> updateSummary(String id, String newSummary) async {
     await _resourcesCollection.doc(id).update({'summary': newSummary});
   }
+  // delete materi 
+  Future<void> deleteResource(String id) async {
+    await _resourcesCollection.doc(id).delete();
+  }
 }
