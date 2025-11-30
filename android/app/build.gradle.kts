@@ -29,7 +29,8 @@ android {
         applicationId = "com.example.projek_akhir_edukasi"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
-        minSdk = 23 // Ini sudah OK (di atas 21)
+        minSdk = 24
+        multiDexEnabled = true
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
@@ -51,4 +52,15 @@ android {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:33.1.2"))
+    implementation("com.google.firebase:firebase-auth-ktx")
+    
+    // INI DIA YANG ANDA CARI
+    implementation("androidx.multidex:multidex:2.0.1")
+    
+    // Anda mungkin juga perlu ini untuk Kotlin
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.23") 
 }
