@@ -3,14 +3,25 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projek_akhir_edukasi/features/academic/screen/classes_screen.dart'; // Import halaman baru
+import 'package:intl/intl.dart';
+import 'package:projek_akhir_edukasi/features/academic/data/course_data.dart';
+import 'package:projek_akhir_edukasi/features/academic/screen/classes_screen.dart';
 import 'package:projek_akhir_edukasi/features/meeting/meeting_screen.dart';
 import 'package:projek_akhir_edukasi/features/meeting/start_meeting_screen.dart';
 import 'package:projek_akhir_edukasi/features/tasks/screen/tasks_screen.dart';
 import 'package:projek_akhir_edukasi/features/resources/screen/resources_screen.dart';
+import 'package:projek_akhir_edukasi/features/academic/screen/class_detail_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  DateTime _selectedDate = DateTime.now();
+  final AcademicService _academicService = AcademicService();
 
   void _startNewMeeting(BuildContext context) {
     Navigator.push(
@@ -21,6 +32,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  // --- PERBAIKAN: Kode Dialog dimasukkan kembali ---
   void _showJoinDialog(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
     final TextEditingController meetingIdController = TextEditingController();
@@ -69,42 +81,14 @@ class HomeScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Meeting ID',
                         labelStyle: TextStyle(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.7)
-                              : Colors.grey.shade600,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF6366F1),
-                            width: 2,
-                          ),
-                        ),
+                            color: isDark ? Colors.white70 : Colors.grey.shade600),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
                         fillColor: isDark
                             ? Colors.white.withOpacity(0.05)
                             : Colors.grey.shade50,
-                        contentPadding: const EdgeInsets.all(16),
                       ),
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.grey.shade800,
-                      ),
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                     ),
                     const SizedBox(height: 16),
                     TextField(
@@ -112,42 +96,14 @@ class HomeScreen extends StatelessWidget {
                       decoration: InputDecoration(
                         labelText: 'Your Name',
                         labelStyle: TextStyle(
-                          color: isDark
-                              ? Colors.white.withOpacity(0.7)
-                              : Colors.grey.shade600,
-                        ),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(
-                            color: isDark
-                                ? Colors.white.withOpacity(0.3)
-                                : Colors.grey.shade300,
-                          ),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: const BorderSide(
-                            color: Color(0xFF6366F1),
-                            width: 2,
-                          ),
-                        ),
+                            color: isDark ? Colors.white70 : Colors.grey.shade600),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                         filled: true,
                         fillColor: isDark
                             ? Colors.white.withOpacity(0.05)
                             : Colors.grey.shade50,
-                        contentPadding: const EdgeInsets.all(16),
                       ),
-                      style: TextStyle(
-                        color: isDark ? Colors.white : Colors.grey.shade800,
-                      ),
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                     ),
                     const SizedBox(height: 24),
                     Row(
@@ -155,64 +111,30 @@ class HomeScreen extends StatelessWidget {
                         Expanded(
                           child: TextButton(
                             onPressed: () => Navigator.pop(dialogContext),
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(
-                                  color: isDark
-                                      ? Colors.white.withOpacity(0.3)
-                                      : Colors.grey.shade300,
-                                ),
-                              ),
-                            ),
-                            child: Text(
-                              'Cancel',
-                              style: TextStyle(
-                                color: isDark
-                                    ? Colors.white.withOpacity(0.7)
-                                    : Colors.grey.shade700,
-                              ),
-                            ),
+                            child: Text('Cancel',
+                                style: TextStyle(
+                                    color: isDark ? Colors.white70 : Colors.grey.shade700)),
                           ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
                           child: ElevatedButton(
                             onPressed: () {
-                              final meetingId =
-                                  meetingIdController.text.trim();
-                              final name = nameController.text.trim();
-
-                              if (meetingId.isEmpty || name.isEmpty) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      'Please fill in Meeting ID and Your Name',
-                                    ),
+                              final meetingId = meetingIdController.text.trim();
+                              if (meetingId.isNotEmpty) {
+                                Navigator.pop(dialogContext);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => MeetingScreen(meetingID: meetingId),
                                   ),
                                 );
-                                return;
                               }
-
-                              Navigator.pop(dialogContext);
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MeetingScreen(
-                                    meetingID: meetingId,
-                                  ),
-                                ),
-                              );
                             },
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFF6366F1),
                               foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              elevation: 4,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                             ),
                             child: const Text('Join'),
                           ),
@@ -234,20 +156,13 @@ class HomeScreen extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final userName = user?.displayName ?? 'Student';
-
-    // Mock data untuk preview di Home (hanya menampilkan data ringkas)
-    final List<Map<String, String>> previewClasses = [
-      {'title': 'Matematika Diskrit', 'subtitle': 'Hari ini pukul 08:00'},
-      {'title': 'Pemrograman Mobile', 'subtitle': 'Hari ini pukul 13:00'},
-      {'title': 'Basis Data', 'subtitle': 'Besok pukul 10:00'},
-    ];
+    final dailySchedules = _academicService.getScheduleForDay(_selectedDate.weekday);
 
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Header Section
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 60, 24, 16),
               child: Column(
@@ -260,71 +175,47 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : Colors.grey.shade900,
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 600.ms)
-                      .slideX(begin: -0.2, end: 0),
+                  ).animate().fadeIn().slideX(),
                   const SizedBox(height: 8),
                   Text(
                     'Ready to learn today?',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      color: isDark
-                          ? Colors.white.withOpacity(0.7)
-                          : Colors.grey.shade600,
-                    ),
-                  )
-                      .animate()
-                      .fadeIn(delay: 200.ms, duration: 600.ms)
-                      .slideX(begin: -0.2, end: 0),
+                    style: GoogleFonts.poppins(fontSize: 16, color: Colors.grey),
+                  ).animate().fadeIn(delay: 200.ms),
                 ],
               ),
             ),
 
-            // Action Grid
+            _buildWeeklyCalendar(isDark),
+            const SizedBox(height: 24),
+
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Row(
                 children: [
-                  // New Meeting Card
                   Expanded(
                     child: _ActionCard(
                       title: 'New Meeting',
                       icon: Icons.videocam,
                       gradient: const LinearGradient(
-                        colors: [
-                          Color(0xFFFF6B6B),
-                          Color(0xFFFF8E53),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
+                          colors: [Color(0xFFFF6B6B), Color(0xFFFF8E53)]),
                       onTap: () => _startNewMeeting(context),
-                    )
-                        .animate()
-                        .fadeIn(delay: 400.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
+                    ),
                   ),
                   const SizedBox(width: 16),
-                  // Join Meeting Card
                   Expanded(
                     child: _ActionCard(
                       title: 'Join Meeting',
                       icon: Icons.add_box_rounded,
                       isGlass: true,
                       onTap: () => _showJoinDialog(context),
-                    )
-                        .animate()
-                        .fadeIn(delay: 500.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Additional Action Buttons (Tugas & Materi)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
               child: Row(
                 children: [
                   Expanded(
@@ -332,18 +223,9 @@ class HomeScreen extends StatelessWidget {
                       title: 'Tugas',
                       icon: Icons.assignment,
                       isGlass: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const TasksScreen(),
-                          ),
-                        );
-                      },
-                    )
-                        .animate()
-                        .fadeIn(delay: 600.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
+                      onTap: () => Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => const TasksScreen())),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -351,80 +233,243 @@ class HomeScreen extends StatelessWidget {
                       title: 'Materi',
                       icon: Icons.topic,
                       isGlass: true,
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ResourcesScreen(),
-                          ),
-                        );
-                      },
-                    )
-                        .animate()
-                        .fadeIn(delay: 700.ms, duration: 600.ms)
-                        .slideY(begin: 0.3, end: 0),
+                      onTap: () => Navigator.push(
+                          context, MaterialPageRoute(builder: (context) => ResourcesScreen())),
+                    ),
                   ),
                 ],
               ),
             ),
 
-            // Upcoming Classes Section (UPDATED)
             Padding(
-              padding: const EdgeInsets.fromLTRB(24, 32, 24, 16),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Kelas Mendatang',
+                    'Jadwal: ${DateFormat('EEEE, d MMM').format(_selectedDate)}',
                     style: GoogleFonts.poppins(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.grey.shade900,
-                    ),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.grey.shade900),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ClassesScreen(),
-                        ),
-                      );
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => const ClassesScreen())).then((_) {
+                        setState(() {});
+                      });
                     },
-                    child: Text(
-                      'Lihat Semua',
-                      style: GoogleFonts.poppins(
-                        color: const Color(0xFF6366F1),
-                        fontWeight: FontWeight.w600,
-                      ),
+                    child: Text('KRS',
+                        style: GoogleFonts.poppins(
+                            color: const Color(0xFF6366F1), fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              ),
+            ),
+
+            if (dailySchedules.isEmpty)
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(Icons.event_available,
+                          size: 48, color: Colors.grey.withOpacity(0.5)),
+                      const SizedBox(height: 8),
+                      Text("Tidak ada kelas hari ini",
+                          style: GoogleFonts.poppins(color: Colors.grey)),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                itemCount: dailySchedules.length,
+                itemBuilder: (context, index) {
+                  final item = dailySchedules[index];
+                  final CourseModel course = item['course'];
+                  final ClassSchedule schedule = item['schedule'];
+
+                  return _ClassScheduleTile(
+                    course: course,
+                    schedule: schedule,
+                  ).animate().fadeIn(delay: (100 * index).ms).slideX();
+                },
+              ),
+            const SizedBox(height: 24),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWeeklyCalendar(bool isDark) {
+    DateTime now = DateTime.now();
+    int currentDayOfWeek = now.weekday;
+    DateTime startOfWeek = now.subtract(Duration(days: currentDayOfWeek - 1));
+
+    return SizedBox(
+      height: 85,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        itemCount: 7,
+        itemBuilder: (context, index) {
+          DateTime date = startOfWeek.add(Duration(days: index));
+          bool isSelected =
+              date.day == _selectedDate.day && date.month == _selectedDate.month;
+          bool isToday = date.day == now.day && date.month == now.month;
+
+          return GestureDetector(
+            onTap: () => setState(() => _selectedDate = date),
+            child: Container(
+              width: 60,
+              margin: const EdgeInsets.only(right: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? const Color(0xFF6366F1)
+                    : (isDark ? Colors.white.withOpacity(0.05) : Colors.white),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: isSelected
+                      ? const Color(0xFF6366F1)
+                      : (isToday
+                          ? const Color(0xFF6366F1).withOpacity(0.5)
+                          : Colors.transparent),
+                ),
+                boxShadow: isSelected
+                    ? [
+                        BoxShadow(
+                            color: const Color(0xFF6366F1).withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4))
+                      ]
+                    : [],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    DateFormat('EEE').format(date),
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: isSelected ? Colors.white : Colors.grey,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    date.day.toString(),
+                    style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: isSelected
+                          ? Colors.white
+                          : (isDark ? Colors.white : Colors.black87),
                     ),
                   ),
                 ],
-              )
-                  .animate()
-                  .fadeIn(delay: 800.ms, duration: 600.ms)
-                  .slideX(begin: -0.2, end: 0),
+              ),
             ),
+          );
+        },
+      ),
+    );
+  }
+}
 
-            // Classes List (Preview only)
-            ListView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              itemCount: previewClasses.length,
-              itemBuilder: (context, index) {
-                final item = previewClasses[index];
-                return _HistoryTile(
-                  title: item['title']!,
-                  subtitle: item['subtitle']!,
-                )
-                    .animate()
-                    .fadeIn(delay: (900 + (index * 100)).ms, duration: 600.ms)
-                    .slideX(begin: -0.2, end: 0);
-              },
+class _ClassScheduleTile extends StatelessWidget {
+  final CourseModel course;
+  final ClassSchedule schedule;
+
+  const _ClassScheduleTile({required this.course, required this.schedule});
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ClassDetailScreen(course: course),
+          ),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.white.withOpacity(0.05) : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+              color: isDark ? Colors.white10 : Colors.grey.shade200),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: course.color.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                children: [
+                  Text(schedule.startTime,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, color: course.color)),
+                  Text("s/d",
+                      style: GoogleFonts.poppins(fontSize: 10, color: Colors.grey)),
+                  Text(schedule.endTime,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold, color: course.color)),
+                ],
+              ),
             ),
-
-            const SizedBox(height: 24),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(course.name,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: isDark ? Colors.white : Colors.black87)),
+                  Text("${course.code} • ${course.sks} SKS",
+                      style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(Icons.location_on_outlined,
+                          size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(schedule.room,
+                          style: GoogleFonts.poppins(fontSize: 12, color: Colors.grey)),
+                      const SizedBox(width: 12),
+                      Icon(Icons.person_outline, size: 14, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Expanded(
+                          child: Text(course.lecturer,
+                              style: GoogleFonts.poppins(
+                                  fontSize: 12, color: Colors.grey),
+                              overflow: TextOverflow.ellipsis)),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            Icon(Icons.chevron_right, color: Colors.grey.shade400),
           ],
         ),
       ),
@@ -432,7 +477,6 @@ class HomeScreen extends StatelessWidget {
   }
 }
 
-// Action Card Widget (Tetap sama)
 class _ActionCard extends StatelessWidget {
   final String title;
   final IconData icon;
@@ -452,179 +496,70 @@ class _ActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: gradient,
-            color: isGlass
-                ? (isDark
-                    ? Colors.white.withOpacity(0.1)
-                    : Colors.white.withOpacity(0.9))
-                : null,
-            borderRadius: BorderRadius.circular(20),
-            border: isGlass
-                ? Border.all(
-                    color: isDark
-                        ? Colors.white.withOpacity(0.2)
-                        : Colors.white.withOpacity(0.5),
-                    width: 1.5,
-                  )
-                : null,
-            boxShadow: gradient != null
-                ? [
-                    BoxShadow(
-                      color: const Color(0xFFFF6B6B).withOpacity(0.3),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : isDark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-          ),
-          child: isGlass
-              ? ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          icon,
-                          size: 40,
-                          color: isDark
-                              ? Colors.white.withOpacity(0.9)
-                              : Colors.grey.shade800,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          title,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isDark
-                                ? Colors.white.withOpacity(0.9)
-                                : Colors.grey.shade800,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      icon,
-                      size: 40,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      title,
-                      style: GoogleFonts.poppins(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ],
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-// History Tile Widget (Tetap sama)
-class _HistoryTile extends StatelessWidget {
-  final String title;
-  final String subtitle;
-
-  const _HistoryTile({
-    required this.title,
-    required this.subtitle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: isDark
-            ? Colors.white.withOpacity(0.05)
-            : Colors.white.withOpacity(0.9),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isDark
-              ? Colors.white.withOpacity(0.1)
-              : Colors.grey.shade200,
-          width: 1,
-        ),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 20,
-              vertical: 12,
-            ),
-            leading: Container(
-              width: 48,
-              height: 48,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF6366F1).withOpacity(0.8),
-                    const Color(0xFF8B5CF6).withOpacity(0.8),
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: const Icon(
-                Icons.calendar_today,
-                color: Colors.white,
-                size: 24,
-              ),
-            ),
-            title: Text(
-              title,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: isDark ? Colors.white : Colors.grey.shade900,
-              ),
-            ),
-            subtitle: Text(
-              subtitle,
-              style: GoogleFonts.poppins(
-                fontSize: 13,
+        gradient: gradient,
+        color: isGlass
+            ? (isDark
+                ? Colors.white.withOpacity(0.1)
+                : Colors.white.withOpacity(0.9))
+            : null,
+        borderRadius: BorderRadius.circular(20),
+        border: isGlass
+            ? Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.7)
-                    : Colors.grey.shade600,
-              ),
-            ),
-            trailing: Icon(
-              Icons.chevron_right,
-              color: isDark
-                  ? Colors.white.withOpacity(0.5)
-                  : Colors.grey.shade400,
+                    ? Colors.white.withOpacity(0.2)
+                    : Colors.white.withOpacity(0.5),
+                width: 1.5,
+              )
+            : null,
+        boxShadow: gradient != null
+            ? [
+                BoxShadow(
+                  color: const Color(0xFFFF6B6B).withOpacity(0.3),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : isDark
+                ? []
+                : [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(20),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  size: 40,
+                  color: gradient != null
+                      ? Colors.white
+                      : (isDark ? Colors.white : Colors.grey.shade800),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  title,
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: gradient != null
+                        ? Colors.white
+                        : (isDark ? Colors.white : Colors.grey.shade800),
+                  ),
+                ),
+              ],
             ),
           ),
         ),
